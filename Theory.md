@@ -6,20 +6,22 @@
 import torch
 from torch import nn
 
-class Net(nn.Module):    
-    def __init__(self, in_features, hidden_size, out_features):        
-        super().__init__()        
-        # Define layers explicitly        
-        self.fc1 = nn.Linear(in_features, hidden_size) # input → hidden        
-        self.relu = nn.ReLU() # activation        
-        self.fc2 = nn.Linear(hidden_size, out_features) # hidden → output
-    
-    def forward(self, x):        
-        # Manually pass data through layers        
-        x = self.fc1(x)        
-        x = self.relu(x)        
-        x = self.fc2(x)        
+
+class Net(nn.Module):
+    def __init__(self, in_features, hidden_size, out_features):
+        super().__init__()
+        # Define layers explicitly
+        self.fc1 = nn.Linear(in_features, hidden_size)  # input → hidden
+        self.relu = nn.ReLU()  # activation
+        self.fc2 = nn.Linear(hidden_size, out_features)  # hidden → output
+
+    def forward(self, x):
+        # Manually pass data through layers
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
         return x
+
 
 # When to use:
 # You need maximum control (custom architectures, skip connections, conditional logic).
@@ -30,18 +32,19 @@ class Net(nn.Module):
 
 # ---
 # 2. Using nn.Sequential (stacking layers)
-class Net(nn.Module):    
-    def __init__(self, in_features, hidden_size, out_features):        
-        super().__init__()        
-        # Pack everything in order in one container        
-        self.layers = nn.Sequential(            
-            nn.Linear(in_features, hidden_size),            
-            nn.ReLU(),            
-            nn.Linear(hidden_size, out_features)        
+class Net(nn.Module):
+    def __init__(self, in_features, hidden_size, out_features):
+        super().__init__()
+        # Pack everything in order in one container
+        self.layers = nn.Sequential(
+            nn.Linear(in_features, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, out_features)
         )
-    
-    def forward(self, x):        
-        return self.layers(x) # One-liner
+
+    def forward(self, x):
+        return self.layers(x)  # One-liner
+
 
 # When to use:
 # Standard feedforward nets where data flows strictly one way, layer after layer.
@@ -52,23 +55,24 @@ class Net(nn.Module):
 
 # ---
 # 3. Dynamic layer creation with nn.ModuleList or nn.ModuleDict
-class Net(nn.Module):    
-    def __init__(self, in_features, hidden_sizes, out_features):        
-        super().__init__()        
-        # Build layers dynamically based on config        
-        self.layers = nn.ModuleList()        
-        prev_size = in_features        
-        for h in hidden_sizes:            
-            self.layers.append(nn.Linear(prev_size, h))            
-            prev_size = h        
+class Net(nn.Module):
+    def __init__(self, in_features, hidden_sizes, out_features):
+        super().__init__()
+        # Build layers dynamically based on config
+        self.layers = nn.ModuleList()
+        prev_size = in_features
+        for h in hidden_sizes:
+            self.layers.append(nn.Linear(prev_size, h))
+            prev_size = h
         self.out = nn.Linear(prev_size, out_features)
-    
-    def forward(self, x):        
-        # Manually loop through layers        
-        for layer in self.layers:            
-            x = torch.relu(layer(x))        
-        x = self.out(x)        
+
+    def forward(self, x):
+        # Manually loop through layers
+        for layer in self.layers:
+            x = torch.relu(layer(x))
+        x = self.out(x)
         return x
+
 
 # When to use:
 # You want variable-length architectures (e.g., “n hidden layers defined by user”).
@@ -81,17 +85,19 @@ class Net(nn.Module):
 # 4. Functional API (torch.nn.functional) instead of defining activations
 import torch.nn.functional as F
 
-class Net(nn.Module):    
-    def __init__(self, in_features, hidden_size, out_features):        
-        super().__init__()        
-        self.fc1 = nn.Linear(in_features, hidden_size)        
+
+class Net(nn.Module):
+    def __init__(self, in_features, hidden_size, out_features):
+        super().__init__()
+        self.fc1 = nn.Linear(in_features, hidden_size)
         self.fc2 = nn.Linear(hidden_size, out_features)
-    
-    def forward(self, x):        
-        # Use functional API for activation instead of module objects        
-        x = F.relu(self.fc1(x))        
-        x = self.fc2(x)        
+
+    def forward(self, x):
+        # Use functional API for activation instead of module objects
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
         return x
+
 
 # When to use:
 # Lightweight models, where you don’t need activation layers as objects (e.g., for sequential).
@@ -102,29 +108,31 @@ class Net(nn.Module):
 
 # ---
 # 5. Container blocks inside container blocks
-class Block(nn.Module):    
-    def __init__(self, in_features, hidden_size):        
-        super().__init__()        
-        self.block = nn.Sequential(            
-            nn.Linear(in_features, hidden_size),            
-            nn.BatchNorm1d(hidden_size),            
-            nn.ReLU()        
+class Block(nn.Module):
+    def __init__(self, in_features, hidden_size):
+        super().__init__()
+        self.block = nn.Sequential(
+            nn.Linear(in_features, hidden_size),
+            nn.BatchNorm1d(hidden_size),
+            nn.ReLU()
         )
-    
-    def forward(self, x):        
+
+    def forward(self, x):
         return self.block(x)
 
-class Net(nn.Module):    
-    def __init__(self, in_features, hidden_size, out_features):        
-        super().__init__()        
-        self.block1 = Block(in_features, hidden_size)        
-        self.block2 = Block(hidden_size, hidden_size)        
+
+class Net(nn.Module):
+    def __init__(self, in_features, hidden_size, out_features):
+        super().__init__()
+        self.block1 = Block(in_features, hidden_size)
+        self.block2 = Block(hidden_size, hidden_size)
         self.fc = nn.Linear(hidden_size, out_features)
-    
-    def forward(self, x):        
-        x = self.block1(x)        
-        x = self.block2(x)        
+
+    def forward(self, x):
+        x = self.block1(x)
+        x = self.block2(x)
         return self.fc(x)
+
 
 # When to use:
 # Deep networks with repeating structures (ResNet, DenseNet, Transformers).
@@ -169,29 +177,31 @@ class Net(nn.Module):
 from torch.utils.data import Dataset
 import pandas as pd
 
-class MyCSVData(Dataset):    
-    def __init__(self, csv_path):        
-        # Load entire CSV into memory        
-        self.data = pd.read_csv(csv_path)        
-        
-        # Separate features (all columns except 'label') and target        
-        self.X = self.data.drop(columns=['label']).values.astype('float32')        
+
+class MyCSVData(Dataset):
+    def __init__(self, csv_path):
+        # Load entire CSV into memory
+        self.data = pd.read_csv(csv_path)
+
+        # Separate features (all columns except 'label') and target
+        self.X = self.data.drop(columns=['label']).values.astype('float32')
         self.y = self.data['label'].values.astype('int64')
-    
-    def __len__(self):        
-        # Number of rows in CSV = number of samples        
+
+    def __len__(self):
+        # Number of rows in CSV = number of samples
         return len(self.data)
-    
-    def __getitem__(self, idx):        
-        # Return sample at given index as torch tensors        
-        x = torch.tensor(self.X[idx])        
-        y = torch.tensor(self.y[idx])        
+
+    def __getitem__(self, idx):
+        # Return sample at given index as torch tensors
+        x = torch.tensor(self.X[idx])
+        y = torch.tensor(self.y[idx])
         return x, y
+
 
 # Usage
 dataset = MyCSVData("mydata.csv")
-print(len(dataset)) # total number of samples
-print(dataset[0]) # first sample (x, y)
+print(len(dataset))  # total number of samples
+print(dataset[0])  # first sample (x, y)
 # Here, dataset[0] returns one row. No batching yet — that’s DataLoader’s job.
 
 # ---
@@ -209,9 +219,9 @@ from torch.utils.data import DataLoader
 dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
 
 # Iterate over it
-for batch in dataloader:    
-    x_batch, y_batch = batch    
-    print(x_batch.shape, y_batch.shape)    
+for batch in dataloader:
+    x_batch, y_batch = batch
+    print(x_batch.shape, y_batch.shape)
     break
 
 # Output (say dataset has 10 features):
@@ -232,9 +242,9 @@ train_dataset = datasets.MNIST(root="./data", train=True, transform=transform, d
 train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
 
 # Iterate through batches
-for images, labels in train_loader:    
-    print(images.shape) # (64, 1, 28, 28)    
-    print(labels.shape) # (64,)    
+for images, labels in train_loader:
+    print(images.shape)  # (64, 1, 28, 28)
+    print(labels.shape)  # (64,)
     break
 
 # ---
@@ -244,9 +254,9 @@ for images, labels in train_loader:
 # 2. You wrap it in a DataLoader → PyTorch uses __getitem__ repeatedly to fetch samples, batches them up, shuffles them, and returns them one batch at a time.
 
 # 3. Training loop consumes DataLoader like a generator:
-# for xb, yb in train_loader:    
-#     preds = model(xb) # forward pass    
-#     loss = loss_fn(preds, yb)    
+# for xb, yb in train_loader:
+#     preds = model(xb) # forward pass
+#     loss = loss_fn(preds, yb)
 #     ...
 
 # ---
