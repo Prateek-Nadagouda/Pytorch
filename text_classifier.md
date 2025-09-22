@@ -576,32 +576,17 @@ if __name__ == '__main__':
 
 ### High-level Pipeline
 
-1. **data_prep.py**: Produces token-level labeled CSV using heuristics
-2. **dataset.py**: Loads CSV and tokenizes text into model-ready tensors
-3. **train.py**: Builds DataLoaders, instantiates model, runs training loop
-4. **evaluate.py**: Loads checkpoint, runs model on test data, prints metrics
-5. **predict.py**: Loads checkpoint and tokenizer, returns label for single text
+1. **dataset.py**: Loads data and tokenizes text into model-ready tensors
+2. **train.py**: Builds DataLoaders, instantiates model, runs training loop
+3. **evaluate.py**: Loads checkpoint, runs model on test data, prints metrics
+4. **predict.py**: Loads checkpoint and tokenizer, returns label for single text
 
 ### Detailed Execution Flow
 
-#### A. Data Preparation (data_prep.py)
-
-1. **Script start**:
-   - Read raw CSV file into dataframe
-   - Apply field detection and labeling functions
-
-2. **Processing each row**:
-   - Split text into tokens using delimiters
-   - Apply heuristic functions to label each token
-   - Each token-label pair becomes a row in output CSV
-
-3. **Output**:
-   - Produces a CSV with tokenized text and corresponding labels
-
-#### B. Dataset Object (FieldDataset)
+#### A. Dataset Object (FieldDataset)
 
 1. **Initialization**:
-   - Loads CSV data into dataframe
+   - Loads data into dataframe
    - Creates tokenizer from model name
    - Maps labels to numeric IDs
 
